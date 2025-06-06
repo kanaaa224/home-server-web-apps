@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="theme-color" content="#333">
+
+        <link rel="stylesheet" href="./src/main.css?v=250421">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.4.47/css/materialdesignicons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/vuetify@3.8.5/dist/vuetify.min.css">
+
+        <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+        <script src="https://unpkg.com/vuetify@3.8.5/dist/vuetify.min.js"></script>
+
+        <style>
+            [v-cloak] { display: none; }
+
+            .fade-enter-active, .fade-leave-active { transition: opacity 0.5s ease; }
+            .fade-enter-from, .fade-leave-to { opacity: 0; }
+            .fade-enter-to, .fade-leave-from { opacity: 1; }
+        </style>
+
+        <script>
+            const API_ENDPOINTS_URL = 'https://raw.githubusercontent.com/kanaaa224/home-server-web-api/refs/heads/main/endpoints.json';
+            const APP_ICON_URL      = 'https://github.com/kanaaa224/home-server-web-api/blob/main/server.png?raw=true';
+        </script>
+    </head>
+    <body>
+        <div class="app" id="app" v-cloak></div>
+
+        <script src="./src/main.js?v=250421"></script>
+    </body>
+</html>

@@ -1,0 +1,72 @@
+@charset "UTF-8";
+
+/* ---------------------------------------------------------------------------------------------- */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    touch-action: manipulation;
+
+    scroll-behavior: smooth;
+
+    @media (width < 600px) {
+        font-size: 14px !important;
+    }
+}
+
+body {
+    font-family: sans-serif;
+
+    user-select: none;
+
+    img {
+        pointer-events: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        background-color: #222;
+    }
+}
+
+/* ---------------------------------------------------------------------------------------------- */
+
+.app {
+    .card-shadow {
+        box-shadow: 0 0 5rem #0000000d !important;
+    }
+
+    .statuses {
+        display: flex;
+        justify-content: center;
+
+        .container {
+            all: unset;
+
+            display: flex;
+            flex-direction: column;
+
+            .item {
+                .container {
+                    all: unset;
+
+                    display: flex;
+                    justify-content: space-between;
+
+                    .name {
+                        margin-right: 7.5rem;
+                    }
+
+                    .status {
+                        .text {
+                            margin-right: 1rem;
+
+                            opacity: 0.5;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

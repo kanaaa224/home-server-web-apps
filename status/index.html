@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="theme-color" content="#333">
+
+        <title>ステータス</title>
+
+        <link rel="icon" href="https://github.com/kanaaa224/home-server-web-api/blob/main/server.png?raw=true">
+        <link rel="apple-touch-icon" href="https://github.com/kanaaa224/home-server-web-api/blob/main/server.png?raw=true">
+        <link rel="stylesheet" href="./src/main.css?v=250421">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.4.47/css/materialdesignicons.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/vuetify@3.8.5/dist/vuetify.min.css">
+
+        <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+        <script src="https://unpkg.com/vuetify@3.8.5/dist/vuetify.min.js"></script>
+
+        <script>
+            const API_ENDPOINTS_URL = 'https://raw.githubusercontent.com/kanaaa224/home-server-web-api/refs/heads/main/endpoints.json';
+        </script>
+    </head>
+    <body>
+        <main>
+            <div class="container" id="app">
+                <v-app>
+                    <v-snackbar
+                        v-model="snackbar_visible"
+                        :timeout="snackbar_time"
+                        :color="snackbar_color"
+                    >{{ snackbar_message }}</v-snackbar>
+                    <v-dialog
+                        v-model="dialog_loading_visible"
+                        max-width="320"
+                        persistent
+                    >
+                        <v-list
+                            class="py-2"
+                            color="primary"
+                            elevation="12"
+                            rounded="lg"
+                        >
+                            <v-list-item
+                                :prepend-icon="dialog_loading_icon"
+                                :title="dialog_loading_title"
+                            >
+                                <template v-slot:prepend>
+                                    <div class="pe-4">
+                                        <v-icon color="primary" size="x-large"></v-icon>
+                                    </div>
+                                </template>
+                                <template v-slot:append>
+                                    <v-progress-circular
+                                        indeterminate="disable-shrink"
+                                        size="16"
+                                        width="2"
+                                    ></v-progress-circular>
+                                </template>
+                            </v-list-item>
+                        </v-list>
+                    </v-dialog>
+                    <v-dialog
+                        v-model="dialog_settings_visible"
+                        transition="dialog-bottom-transition"
+                        fullscreen
+                    >
+                        <v-card>
+                            <v-toolbar>
+                                <v-btn
+                                    icon="mdi-close"
+                                    @click="dialog_settings_visible = false"
+                                ></v-btn>
+                                <v-toolbar-title>設定</v-toolbar-title>
+                            </v-toolbar>
+                            <v-list lines="two">
+                                <v-list-subheader>General</v-list-subheader>
+                                <!--<v-list-item
+                                    title="データの更新間隔を変更"
+                                    subtitle="データを取得する間隔（秒数）を設定します"
+                                    link
+                                    @click="dialog_settings('update-interval-change')"
+                                ></v-list-item>-->
+                                <v-list-item
+                                    title="今すぐ更新"
+                                    subtitle="今すぐデータを取得して更新します"
+                                    link
+                                    @click="dialog_settings('execute-update')"
+                                ></v-list-item>
+                                <v-divider></v-divider>
+                                <v-list-subheader>システムAPI</v-list-subheader>
+                                <v-list-item
+                                    title="アタッチされているAPI"
+                                    :subtitle="API_NAME"
+                                    link
+                                    href="https://github.com/kanaaa224/home-server-web-api/"
+                                    target="_blank"
+                                    rel="noopener"
+                                ></v-list-item>
+                                <v-list-item
+                                    title="バージョン"
+                                    :subtitle="API_VERSION"
+                                ></v-list-item>
+                                <v-list-item
+                                    title="エンドポイント"
+                                    :subtitle="API_URI"
+                                    link
+                                    :href="API_URI"
+                                    target="_blank"
+                                    rel="noopener"
+                                ></v-list-item>
+                                <v-divider></v-divider>
+                                <v-list-subheader>アプリケーション</v-list-subheader>
+                                <v-list-item
+                                    title="バージョン"
+                                    :subtitle="APP_VERSION"
+                                ></v-list-item>
+                            </v-list>
+                        </v-card>
+                    </v-dialog>
+                    <v-dialog
+                        v-model="dialog_password_input_visible"
+                        width="auto"
+                        persistent
+                    >
+                        <v-card
+                            max-width="500"
+                            prepend-icon="mdi-lock"
+                            title="パスワードを入力"
+                            text="操作をリクエストするため、パスワードを入力してください。"
+                        >
+                            <v-card-text>
+                                <v-text-field
+                                    ref="dialog_password_input_ref"
+                                    v-model="dialog_password_input_value"
+                                    label="パスワード*"
+                                    required
+                                    :rules="dialog_password_input_rules"
+                                    :loading="dialog_password_input_loading"
+                                    :disabled="dialog_password_input_loading"
+                                ></v-text-field>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    variant="plain"
+                                    text="Cancel"
+                                    @click="dialog_password_input_visible = false"
+                                    :disabled="dialog_password_input_loading"
+                                ></v-btn>
+                                <v-btn
+                                    variant="tonal"
+                                    text="OK"
+                                    color="primary"
+                                    @click="dialog_password_input()"
+                                    :disabled="dialog_password_input_loading"
+                                ></v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                    <v-dialog
+                        v-model="dialog_password_notice_visible"
+                        width="auto"
+                    >
+                        <v-card
+                            max-width="400"
+                            prepend-icon="mdi-lock"
+                            title="パスワードが必要です"
+                            text="この操作にはパスワードが必要です。次の画面でパスワードを入力してください。"
+                        >
+                            <v-card-actions>
+                                <v-btn
+                                    class="ms-auto"
+                                    text="OK"
+                                    @click="dialog_password_notice()"
+                                ></v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                    <v-dialog
+                        v-model="dialog_operate_visible"
+                        width="auto"
+                    >
+                        <v-card
+                            width="500"
+                            prepend-icon="mdi-lightning-bolt"
+                            title="サーバーコントロール"
+                            text="起動/アップデート操作はサーバーの状態が「停止中」のとき、停止操作は「実行中」のときにできます。"
+                        >
+                            <v-card-text>
+                                <v-select
+                                    v-model="dialog_operate_select_value_1"
+                                    :items="apps.map(app => app.name)"
+                                    label="操作対象のアプリ*"
+                                    required
+                                ></v-select>
+                                <v-select
+                                    v-model="dialog_operate_select_value_2"
+                                    :items="[ '起動', '停止', '更新' ]"
+                                    label="リクエストする操作*"
+                                    required
+                                ></v-select>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    variant="plain"
+                                    text="Cancel"
+                                    @click="dialog_operate_visible = false"
+                                    :disabled="dialog_operate_loading"
+                                ></v-btn>
+                                <v-btn
+                                    variant="tonal"
+                                    text="Send"
+                                    color="primary"
+                                    @click="dialog_operate()"
+                                    :disabled="dialog_operate_loading"
+                                ></v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                    <v-dialog
+                        v-model="dialog_confirm_visible"
+                        width="auto"
+                    >
+                        <v-card
+                            max-width="400"
+                            prepend-icon="mdi-lightning-bolt"
+                            title="サーバーコントロール"
+                            text="この内容でリクエストを送信しますか？"
+                        >
+                            <v-card-text>"{{ dialog_operate_select_value_1 }}" を {{ dialog_operate_select_value_2 }} する</v-card-text>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    variant="plain"
+                                    text="Cancel"
+                                    @click="dialog_confirm_visible = false"
+                                    :disabled="dialog_confirm_loading"
+                                ></v-btn>
+                                <v-btn
+                                    variant="tonal"
+                                    text="Send"
+                                    color="primary"
+                                    @click="dialog_confirm()"
+                                    :disabled="dialog_confirm_loading"
+                                ></v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                    <v-main class="d-flex">
+                        <v-container
+                            class="d-flex flex-column justify-center align-center"
+                            fill-height
+                        >
+                            <transition name="fade">
+                                <div v-if="statuses_visible">
+                                    <h2>サーバーステータス</h2>
+                                    <p>現在のサーバーの状態をリアルタイムで表示しています</p>
+                                </div>
+                            </transition>
+                            <transition name="fade">
+                                <div
+                                    class="statuses my-7"
+                                    v-if="statuses_visible"
+                                    key="statuses"
+                                >
+                                    <div class="container">
+                                        <div
+                                            class="item"
+                                            v-for="app in apps"
+                                            :key="app.id"
+                                        >
+                                            <div class="container">
+                                                <span class="name">{{ app.name }}</span>
+                                                <span class="status">
+                                                    <span class="text">{{
+                                                        app.status === 'running'  ? '実行中' :
+                                                        app.status === 'stopped'  ? '停止中' :
+                                                        app.status === 'updating' ? '更新中' : '不明'
+                                                    }}</span>
+                                                    <span
+                                                        :style="{
+                                                            color:      app.status === 'running'  ? '#00ff00' :
+                                                                        app.status === 'stopped'  ? '#ff0000' :
+                                                                        app.status === 'updating' ? '#ffa400' : 'gray',
+                                                            textShadow: app.status === 'running'  ? '0 0 1rem #00ff0080' :
+                                                                        app.status === 'stopped'  ? '0 0 1rem #ff000080' :
+                                                                        app.status === 'updating' ? '0 0 1rem #ffa40080' : 'none'
+                                                        }"
+                                                    >●</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </transition>
+                            <transition name="fade">
+                                <div v-if="button_visible" class="d-flex justify-center align-center" style="gap: 1rem;">
+                                    <v-btn color="secondary" @click="dialog_operate()">サーバーをコントロール...</v-btn>
+                                    <v-btn color="secondary" @click="dialog_settings()"><v-icon>mdi-cog</v-icon></v-btn>
+                                    <v-btn
+                                        color="secondary"
+                                        @click="theme.global.name.value = theme.global.name.value === 'dark' ? 'light' : 'dark'"
+                                    >
+                                        <v-icon>{{ theme.global.name.value === 'dark' ? 'mdi-weather-night' : 'mdi-white-balance-sunny' }}</v-icon>
+                                    </v-btn>
+                                </div>
+                            </transition>
+                        </v-container>
+                    </v-main>
+                    <v-footer
+                        app
+                        class="justify-center pa-2"
+                        style="opacity: 0.5; background-color: transparent;"
+                    >
+                        <span class="text-body-2">
+                            © 2025 <a
+                                href="https://github.com/kanaaa224/"
+                                target="_blank"
+                                rel="noopener"
+                                style="color: inherit;"
+                            >kanaaa224</a>. All rights reserved.
+                        </span>
+                    </v-footer>
+                </v-app>
+            </div>
+        </main>
+        <script src="./src/main.js?v=250421"></script>
+    </body>
+</html>

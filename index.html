@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,viewport-fit=cover,user-scalable=no">
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#222">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+
+        <link rel="icon" type="image/png" href="https://github.com/kanaaa224.png">
+        <link rel="apple-touch-icon"      href="https://github.com/kanaaa224.png">
+
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            html {
+                touch-action: manipulation;
+
+                scroll-behavior: smooth;
+
+                @media (width < 600px) {
+                    font-size: 14px !important;
+                }
+            }
+
+            body {
+                font-family: sans-serif;
+
+                user-select: none;
+
+                img {
+                    pointer-events: none;
+                }
+
+                @media (prefers-color-scheme: dark) {
+                    background-color: #222;
+                    color:            #fff;
+                }
+            }
+
+            /* ---------------------------------------------------------------------------------------------- */
+
+            main {
+                .container {
+                    display: flex;
+                    flex-direction: column;
+
+                    p, a {
+                        margin: 1rem 1rem 0 1rem;
+                    }
+
+                    a {
+                        color: inherit;
+
+                        padding: 1rem 1.5rem;
+
+                        background-color: #0000000d;
+
+                        @media (prefers-color-scheme: dark) {
+                            background-color: #ffffff0d;
+                        }
+
+                        border-radius: 0.5rem;
+                    }
+                }
+            }
+
+            footer {
+                .container {
+                    position: fixed;
+
+                    right: 0;
+                    bottom: 0;
+                    left: 0;
+
+                    width: fit-content;
+
+                    margin: 0 auto;
+
+                    opacity: 0.5;
+
+                    p {
+                        margin: 0 0 0.75rem 0;
+
+                        font-size: 0.75rem;
+                    }
+
+                    a {
+                        color: inherit;
+                    }
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div class="container"></div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <p>© 2024 <a href="https://kanaaa224.github.io" target="_blank">kanaaa224</a>. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <script type="module">
+            const callAPI = async (endpoint = '', queries = {}, requestBody = null) => {
+                const url = new URL(endpoint);
+
+                for(const [ key, value ] of Object.entries(queries)) url.searchParams.set(key, value);
+
+                let request = { method: 'GET' };
+
+                if(requestBody) request = { method: 'POST', body: JSON.stringify(requestBody) };
+
+                const response = await fetch(url.toString(), request);
+                const body     = await response.json();
+
+                if(!response.ok) throw new Error(`api-bad-status: ${response.status}`);
+
+                return body;
+            };
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            const user = 'kanaaa224';
+            const repo = window.location.pathname.split('/').filter(Boolean)[0];
+            const path = '';
+
+            const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
+
+            document.title = `${user} / ${repo}`;
+
+            const container = document.querySelector('body main .container');
+
+            const p = document.createElement('p');
+
+            p.innerHTML = `${document.title}<br>このリポジトリ内のアプリ一覧`;
+
+            container.appendChild(p);
+
+            try {
+                const data = await callAPI(url);
+
+                data.filter(item => item.type === 'dir').forEach(dir => {
+                    const a = document.createElement('a');
+
+                    a.href        = `${dir.name}/`;
+                    a.target      = '_blank';
+                    a.textContent = dir.name;
+
+                    container.appendChild(a);
+                });
+            } catch(e) {
+                console.error(e);
+            }
+        </script>
+    </body>
+</html>

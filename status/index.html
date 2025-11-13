@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,viewport-fit=cover,user-scalable=no">
+
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#222">
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/7.4.47/css/materialdesignicons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/vuetify@3.8.5/dist/vuetify.min.css">
+        <link rel="stylesheet" href="./src/main.css?v=250421">
+
+        <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/kanaaa224/home-server-web-api@master/server.png">
+        <link rel="apple-touch-icon"      href="https://cdn.jsdelivr.net/gh/kanaaa224/home-server-web-api@master/server.png">
+
+        <script src="https://cdn.jsdelivr.net/gh/kanaaa224/home-server-web-api@master/dist/web-api-client.min.js"></script>
+        <script src="https://unpkg.com/vue@3.5.21/dist/vue.global.prod.js"></script>
+        <script src="https://unpkg.com/vuetify@3.8.5/dist/vuetify.min.js"></script>
+
+        <style>
+            [v-cloak] { display: none; }
+        </style>
+
+        <script>
+            const API_ENDPOINTS_URL = 'https://cdn.jsdelivr.net/gh/kanaaa224/home-server-web-api@master/dist/endpoints.json';
+            const APP_ICON_URL      = 'https://cdn.jsdelivr.net/gh/kanaaa224/home-server-web-api@master/server.png';
+
+            const APP_NAME = 'サーバーステータス';
+
+            const api = new WebAPIClient(API_ENDPOINTS_URL, 'v1');
+        </script>
+    </head>
+    <body>
+        <div class="app" id="app" v-cloak></div>
+
+        <script src="./src/main.js?v=250421"></script>
+    </body>
+</html>
